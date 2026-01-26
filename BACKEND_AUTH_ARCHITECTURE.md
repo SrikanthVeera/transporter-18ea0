@@ -155,4 +155,12 @@ CREATE TABLE otp_logs (
     attempts INT DEFAULT 0,
     PRIMARY KEY (mobile) -- Ensures only 1 active OTP per user
 );
-```
+```       .env file
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=srikanth12345
+DB_NAME=transporter_app
+PORT=5000
+
+
+JWT_SECRET=someVeryStrongRandomSecret123

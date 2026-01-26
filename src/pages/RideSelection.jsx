@@ -4,7 +4,7 @@ import { useLocationService } from '../hooks/useLocationService';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Car, Truck, Clock, MapPin, Star, ArrowRight, Shield, Info, ChevronLeft, Navigation } from 'lucide-react';
+import { Car, Truck, Clock, MapPin, Star, ArrowRight, Shield, Info, ChevronLeft, Navigation, User, Package } from 'lucide-react';
 import { signInWithPhoneNumber } from "firebase/auth";
 import { auth, initRecaptcha } from "../services/firebase";
 
@@ -16,65 +16,87 @@ import { GoogleMap, DirectionsRenderer, MarkerF } from '@react-google-maps/api';
 import autoImg from '../assets/auto1.jpg';
 import carImg from '../assets/car1.jpg';
 import truckImg from '../assets/truck1.jpg';
+import customerAppImg from '../assets/playstorecustomer.png';
+import driverAppImg from '../assets/playstoredriver.png';
 
 
-const RideCard = ({ id, name, price, distance, duration, icon: Icon, description, selected, onSelect }) => (
+const RideCard = ({ ride, selected, onSelect }) => (
     <motion.div
         layout
-        onClick={() => onSelect(id)}
-        whileHover={{ backgroundColor: selected ? '#faf5ff' : '#f8f9fa' }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.98 }}
-        className={`relative p-4 rounded-xl cursor-pointer border-2 transition-all flex items-center gap-4 mb-3
+        onClick={() => onSelect(ride.id)}
+        className={`relative p-4 mb-3 rounded-2xl cursor-pointer border-2 transition-all duration-300 flex items-center gap-4 group overflow-hidden
             ${selected
-                ? 'border-black bg-gray-50 shadow-sm'
-                : 'border-transparent hover:border-gray-200 bg-white'
+                ? 'border-gray-900 bg-white shadow-xl z-10 ring-1 ring-gray-900/5'
+                : 'border-transparent bg-white hover:bg-gray-50 hover:shadow-lg shadow-sm'
             }`}
     >
-        {/* Vehicle Icon */}
-        <div className="relative">
-            <div className={`w-16 h-16 rounded-lg flex items-center justify-center bg-gray-100`}>
-                <Icon size={32} className="text-gray-800" />
-            </div>
+        {/* Selected Accent Background */}
+        {selected && (
+            <motion.div
+                layoutId="selected-bg"
+                className="absolute inset-0 bg-gray-50 -z-10"
+                initial={false}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            />
+        )}
+
+        {/* Vehicle Image */}
+        <div className={`relative w-16 h-16 shrink-0 rounded-xl flex items-center justify-center transition-colors
+            ${selected ? 'bg-white shadow-sm' : 'bg-gray-50 group-hover:bg-white'}`}>
+            {ride.image ? (
+                <img src={ride.image} alt={ride.name} className="w-full h-full object-contain mix-blend-multiply p-1" />
+            ) : (
+                <ride.icon size={32} className="text-gray-700" />
+            )}
         </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 py-1">
             <div className="flex justify-between items-start">
-                <div>
-                    <h3 className="font-bold text-gray-900 text-lg leading-tight">{name}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+                <div className="flex flex-col">
+                    <h3 className="font-extrabold text-gray-900 text-lg leading-tight tracking-tight">{ride.name}</h3>
+                    <p className="text-xs text-gray-500 font-medium mt-0.5 line-clamp-1">{ride.description}</p>
                 </div>
                 <div className="text-right">
-                    <div className="font-bold text-lg text-gray-900">
-                        {price ? `₹${price}` : <span className="text-gray-300">--</span>}
-                    </div>
+                    <span className="block font-extrabold text-xl text-gray-900 tracking-tight">
+                        {ride.price ? `₹${ride.price}` : <span className="text-gray-300">--</span>}
+                    </span>
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 mt-2">
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider">
-                    <Clock size={10} /> {duration ? `${duration} min` : '--'}
+            <div className="flex items-center gap-3 mt-2.5">
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm border
+                    ${selected ? 'bg-black text-white border-black' : 'bg-green-50 text-green-700 border-green-100'}`}>
+                    <Clock size={10} className={selected ? "text-white" : "text-green-600"} /> {ride.duration ? `${ride.duration} MIN` : '--'}
                 </span>
-                <span className="text-xs text-gray-500 font-medium">
-                    {distance ? `${distance} km` : ''}
-                </span>
+
+                {ride.distance && (
+                    <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                        <Navigation size={10} /> {ride.distance} km
+                    </span>
+                )}
             </div>
         </div>
 
-        {/* Selection Indicator */}
-        {selected && (
-            <div className="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-6 bg-black rounded-full flex items-center justify-center text-white shadow-lg z-10">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-            </div>
-        )}
+        {/* Selection Checkmark */}
+        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300
+            ${selected ? 'border-gray-900 bg-gray-900' : 'border-gray-200 bg-transparent'}`}>
+            {selected && <div className="w-2.5 h-1.5 border-b-2 border-l-2 border-white -rotate-45 mb-0.5"></div>}
+        </div>
     </motion.div>
 );
 
 const RideSelection = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [selectedRide, setSelectedRide] = useState(null);
     const [fareDetails, setFareDetails] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [serviceType, setServiceType] = useState(location.state?.serviceType || 'passenger'); // 'passenger' | 'goods'
 
     // OTP Flow States
 
@@ -113,8 +135,6 @@ const RideSelection = () => {
             }
         };
     }, []);
-
-    const location = useLocation();
 
     // Initialize Location Service with fallback/default values
     const {
@@ -353,6 +373,12 @@ const RideSelection = () => {
         }
     ];
 
+    const filteredVehicles = vehicles.filter(v => {
+        if (serviceType === 'passenger') return ['auto', 'car'].includes(v.id);
+        if (serviceType === 'goods') return ['truck'].includes(v.id);
+        return false;
+    });
+
     return (
         <div className="min-h-screen w-full bg-gray-100 font-sans">
             <Navbar />
@@ -488,7 +514,7 @@ const RideSelection = () => {
                                         placeholder="Current Location"
                                         value={pickup}
                                         onChange={(e) => setPickup(e.target.value)}
-                                        className="w-full bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500 rounded-xl py-3.5 pl-10 pr-12 text-gray-900 font-medium placeholder-gray-400 text-base"
+                                        className="w-full bg-gray-50 border-0 focus:ring-2 focus:ring-purple-500 rounded-xl py-2.5 pl-10 pr-12 text-gray-900 font-medium placeholder-gray-400 text-sm"
                                     />
                                     {/* Locate Button inside input */}
                                     <button
@@ -511,7 +537,7 @@ const RideSelection = () => {
                                         placeholder="Enter Destination"
                                         value={drop}
                                         onChange={(e) => setDrop(e.target.value)}
-                                        className="w-full bg-gray-50 border-0 focus:ring-2 focus:ring-black rounded-xl py-3.5 pl-10 pr-4 text-gray-900 font-medium placeholder-gray-400 text-base"
+                                        className="w-full bg-gray-50 border-0 focus:ring-2 focus:ring-black rounded-xl py-2.5 pl-10 pr-4 text-gray-900 font-medium placeholder-gray-400 text-sm"
                                     />
                                 </div>
                             </div>
@@ -523,59 +549,51 @@ const RideSelection = () => {
                             <span className="truncate">50% off | Heavy traffic reported</span>
                         </div>
 
-                        {/* Ride Options List */}
-                        <div className="space-y-3">
-                            {vehicles.map((ride) => (
-                                <div
-                                    key={ride.id}
-                                    onClick={() => setSelectedRide(ride.id)}
-                                    className={`relative p-4 rounded-xl cursor-pointer border-2 transition-all flex items-center gap-4 active:scale-[0.99]
-                                        ${selectedRide === ride.id
-                                            ? 'border-purple-600 bg-purple-50/50 shadow-md ring-1 ring-purple-100'
-                                            : 'border-transparent bg-gray-50 hover:bg-gray-100'
-                                        }`}
+                        {/* Service Selection (Mobile) */}
+                        <div className="mb-6 px-1">
+                            <h3 className="text-gray-900 font-bold text-base mb-3">What do you need?</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    className={`relative p-2.5 rounded-xl border-2 flex flex-row items-center justify-center gap-2 transition-all duration-200
+                                        ${serviceType === 'passenger'
+                                            ? 'border-gray-900 bg-gray-900 text-white shadow-lg scale-[1.02]'
+                                            : 'border-transparents bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                                 >
-                                    {/* Icon */}
-                                    <div className="relative shrink-0">
-                                        <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-white shadow-sm border border-gray-100 overflow-hidden">
-                                            {ride.image ? (
-                                                <img src={ride.image} alt={ride.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <ride.icon size={26} className="text-gray-800" />
-                                            )}
-                                        </div>
-                                    </div>
+                                    <User size={18} />
+                                    <span className="text-sm font-bold">Ride</span>
+                                    {serviceType === 'passenger' && <div className="absolute -bottom-1 w-8 h-1 bg-white/20 rounded-full"></div>}
+                                </button>
+                                <button
+                                    onClick={() => { setServiceType('goods'); setSelectedRide(null); }}
+                                    className={`relative p-2.5 rounded-xl border-2 flex flex-row items-center justify-center gap-2 transition-all duration-200
+                                        ${serviceType === 'goods'
+                                            ? 'border-gray-900 bg-gray-900 text-white shadow-lg scale-[1.02]'
+                                            : 'border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                                >
+                                    <Package size={18} />
+                                    <span className="text-sm font-bold">Package</span>
+                                    {serviceType === 'goods' && <div className="absolute -bottom-1 w-8 h-1 bg-white/20 rounded-full"></div>}
+                                </button>
+                            </div>
+                        </div>
 
-                                    {/* Details */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 text-lg leading-tight">{ride.name}</h3>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    {ride.duration && (
-                                                        <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
-                                                            {ride.duration} min
-                                                        </span>
-                                                    )}
-                                                    <p className="text-xs text-gray-500 line-clamp-1">{ride.description}</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="font-bold text-lg text-gray-900">
-                                                    {ride.price ? `₹${ride.price}` : <span className="text-gray-300">--</span>}
-                                                </div>
-                                                {ride.distance && <div className="text-[10px] text-gray-400 font-medium">{ride.distance} km</div>}
-                                            </div>
-                                        </div>
-                                    </div>
+                        <h3 className="font-bold text-gray-900 text-lg mb-3 px-1">
+                            {serviceType === 'passenger' ? 'Available Rides' : 'Transport Options'}
+                        </h3>
 
-                                    {/* Radio */}
-                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
-                                        ${selectedRide === ride.id ? 'border-purple-600' : 'border-gray-300'}`}>
-                                        {selectedRide === ride.id && <div className="w-2.5 h-2.5 bg-purple-600 rounded-full"></div>}
-                                    </div>
-                                </div>
-                            ))}
+                        {/* Ride Options List */}
+                        <div className="space-y-1 px-1">
+                            <AnimatePresence mode='popLayout'>
+                                {filteredVehicles.map((ride) => (
+                                    <RideCard
+                                        key={ride.id}
+                                        ride={ride}
+                                        selected={selectedRide === ride.id}
+                                        onSelect={setSelectedRide}
+                                    />
+                                ))}
+                            </AnimatePresence>
+
 
                             {loading && (
                                 <div className="space-y-3">
@@ -589,10 +607,16 @@ const RideSelection = () => {
 
                     {/* Fixed Bottom Button (Inside Sheet - Flex Child) */}
                     <div className="shrink-0 p-4 bg-white border-t border-gray-100 z-30 safe-area-bottom shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+                        <div className="flex items-center mb-3">
+                            <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-bold text-gray-900 border border-gray-200 transition-colors">
+                                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                Cash
+                            </button>
+                        </div>
                         <button
                             disabled={!selectedRide}
                             onClick={handleContinue}
-                            className={`w-full py-4 rounded-xl text-lg font-bold shadow-xl transition-all flex items-center justify-center gap-2
+                            className={`w-full py-3 rounded-xl text-base font-bold shadow-xl transition-all flex items-center justify-center gap-2
                                 ${selectedRide
                                     ? 'bg-purple-600 text-white hover:bg-purple-700 active:scale-[0.98] shadow-purple-200'
                                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -608,7 +632,7 @@ const RideSelection = () => {
             {/* Desktop Layout */}
             <div className="hidden lg:flex h-screen pt-16">
                 {/* Left Side - Ride Selection Box */}
-                <div className="w-full lg:w-[450px] p-4 bg-gray-100">
+                <div className="w-full lg:w-[500px] p-4 bg-gray-100">
                     <div className="bg-white rounded-2xl shadow-xl overflow-hidden h-full flex flex-col">
                         {/* NEWS TICKER / HEADLINE */}
                         <div className="bg-purple-600 text-white text-xs font-bold py-2 overflow-hidden whitespace-nowrap">
@@ -664,63 +688,51 @@ const RideSelection = () => {
 
                         {/* Ride List - Scrollable */}
                         <div className="flex-1 p-4 bg-gray-50/50 overflow-y-auto">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Available Rides</h3>
 
-                            <div className="space-y-3">
-                                {vehicles.map((ride) => (
-                                    <div
-                                        key={ride.id}
-                                        onClick={() => setSelectedRide(ride.id)}
-                                        className={`relative p-4 rounded-xl cursor-pointer border-2 transition-all flex items-center gap-4
-                                            ${selectedRide === ride.id
-                                                ? 'border-purple-600 bg-purple-50 shadow-sm'
-                                                : 'border-transparent hover:border-gray-200 bg-white'
-                                            }`}
+                            {/* Service Selection (Desktop) */}
+                            <div className="mb-6">
+                                <h3 className="text-gray-900 font-bold text-base mb-3">What do you need?</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        onClick={() => { setServiceType('passenger'); setSelectedRide(null); }}
+                                        className={`relative p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all duration-200
+                                            ${serviceType === 'passenger'
+                                                ? 'border-gray-900 bg-gray-900 text-white shadow-lg scale-[1.02]'
+                                                : 'border-transparents bg-white text-gray-500 hover:bg-gray-100'}`}
                                     >
-                                        {/* Vehicle Icon */}
-                                        <div className="relative">
-                                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 overflow-hidden">
-                                                {ride.image ? (
-                                                    <img src={ride.image} alt={ride.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <ride.icon size={24} className="text-gray-800" />
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Info */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h3 className="font-bold text-gray-900 text-base leading-tight">{ride.name}</h3>
-                                                    <p className="text-xs text-gray-500 mt-0.5">{ride.description}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="font-bold text-base text-gray-900">
-                                                        {ride.price ? `₹${ride.price}` : <span className="text-gray-300">--</span>}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-3 mt-2">
-                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider">
-                                                    <Clock size={8} /> 2 min
-                                                </span>
-                                                <span className="text-xs text-gray-500 font-medium">
-                                                    {ride.distance ? `${ride.distance} km` : ''}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Selection Indicator */}
-                                        {selectedRide === ride.id && (
-                                            <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center text-white">
-                                                <div className="w-2 h-2 bg-white rounded-full"></div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                        <User size={20} />
+                                        <span className="text-sm font-bold">Passenger</span>
+                                    </button>
+                                    <button
+                                        onClick={() => { setServiceType('goods'); setSelectedRide(null); }}
+                                        className={`relative p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all duration-200
+                                            ${serviceType === 'goods'
+                                                ? 'border-gray-900 bg-gray-900 text-white shadow-lg scale-[1.02]'
+                                                : 'border-transparent bg-white text-gray-500 hover:bg-gray-100'}`}
+                                    >
+                                        <Package size={20} />
+                                        <span className="text-sm font-bold">Sending Goods</span>
+                                    </button>
+                                </div>
                             </div>
+
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">
+                                {serviceType === 'passenger' ? 'Available Rides' : 'Transport Options'}
+                            </h3>
+
+                            <div className="space-y-1">
+                                <AnimatePresence mode='popLayout'>
+                                    {filteredVehicles.map((ride) => (
+                                        <RideCard
+                                            key={ride.id}
+                                            ride={ride}
+                                            selected={selectedRide === ride.id}
+                                            onSelect={setSelectedRide}
+                                        />
+                                    ))}
+                                </AnimatePresence>
+                            </div>
+
 
                             {loading && (
                                 <div className="space-y-3">
@@ -869,10 +881,8 @@ const RideSelection = () => {
                         {/* Customer App */}
                         <div className="bg-gray-50 p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all group">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                    <div className="w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center">
-                                        <span className="text-white font-bold text-sm">T</span>
-                                    </div>
+                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                                    <img src={customerAppImg} alt="Transporter Customer App" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-purple-600 group-hover:translate-x-2 transition-transform">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -895,13 +905,8 @@ const RideSelection = () => {
                         {/* Driver App */}
                         <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all group border-2 border-purple-200">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                    <div className="w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center relative">
-                                        <span className="text-white font-bold text-sm">T</span>
-                                        <div className="absolute -bottom-1 -right-1 bg-gray-900 text-white text-xs px-1 rounded">
-                                            DRIVER
-                                        </div>
-                                    </div>
+                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                                    <img src={driverAppImg} alt="Transporter Driver App" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-purple-600 group-hover:translate-x-2 transition-transform">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

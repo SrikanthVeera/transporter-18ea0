@@ -1,7 +1,12 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Users, Target, Award, Globe, Shield, Heart, Zap, CheckCircle, Car, Truck, Crown } from 'lucide-react';
+import { Users, Target, Award, Globe, Shield, Heart, Zap, CheckCircle, Car, Truck as TruckIcon, Crown } from 'lucide-react';
+import customerAppImg from '../assets/playstorecustomer.png';
+import driverAppImg from '../assets/playstoredriver.png';
+import autoImg from '../assets/auto1.jpg';
+import carImg from '../assets/car1.jpg';
+import truckImg from '../assets/truck1.jpg';
 
 const About = () => {
     return (
@@ -29,7 +34,7 @@ const About = () => {
                         </h1>
 
                         <p className="text-lg text-slate-600 max-w-lg leading-relaxed">
-                            We're not just a ride-hailing service. We're building the future of transportation, 
+                            We're not just a ride-hailing service. We're building the future of transportation,
                             connecting communities and empowering millions across India.
                         </p>
 
@@ -67,7 +72,7 @@ const About = () => {
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Our Impact</h3>
                                 <p className="text-slate-500 text-sm">Transforming mobility across India</p>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="text-center p-4 bg-purple-50 rounded-xl">
                                     <div className="text-3xl font-black text-purple-600">10M+</div>
@@ -109,12 +114,12 @@ const About = () => {
                                     <h2 className="text-3xl font-heading font-bold text-gray-900">Our Mission</h2>
                                 </div>
                                 <p className="text-lg text-gray-600 leading-relaxed">
-                                    To make transportation accessible, affordable, and reliable for everyone. 
-                                    We believe mobility is a fundamental right that should connect people to 
+                                    To make transportation accessible, affordable, and reliable for everyone.
+                                    We believe mobility is a fundamental right that should connect people to
                                     opportunities, not create barriers.
                                 </p>
                             </div>
-                            
+
                             <div className="space-y-6">
                                 <div className="flex items-center gap-3">
                                     <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -123,13 +128,13 @@ const About = () => {
                                     <h2 className="text-3xl font-heading font-bold text-gray-900">Our Vision</h2>
                                 </div>
                                 <p className="text-lg text-gray-600 leading-relaxed">
-                                    To become India's most trusted mobility platform, creating sustainable 
-                                    livelihoods for millions while building smarter, cleaner cities for 
+                                    To become India's most trusted mobility platform, creating sustainable
+                                    livelihoods for millions while building smarter, cleaner cities for
                                     future generations.
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-tr from-purple-100 to-indigo-50 blur-3xl rounded-full opacity-70 transform scale-90"></div>
                             <div className="relative bg-white rounded-2xl p-8 shadow-2xl border border-gray-100">
@@ -164,13 +169,14 @@ const About = () => {
                             Choose from our range of vehicles designed to meet every travel need
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Auto Service */}
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all group">
+                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all group overflow-hidden">
                             <div className="text-center space-y-6">
-                                <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                                    <Truck className="text-purple-600" size={40} />
+                                <div className="h-40 flex items-center justify-center relative mb-4">
+                                    <div className="absolute inset-0 bg-yellow-50 rounded-full blur-2xl opacity-60 scale-75 group-hover:scale-100 transition-all"></div>
+                                    <img src={autoImg} alt="Auto" className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Auto</h3>
@@ -202,13 +208,14 @@ const About = () => {
                         </div>
 
                         {/* Car Service */}
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all group relative">
-                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                <span className="bg-purple-600 text-white px-4 py-1 rounded-full text-xs font-bold">POPULAR</span>
+                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all group relative overflow-hidden">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
+
                             </div>
                             <div className="text-center space-y-6">
-                                <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                                    <Car className="text-purple-600" size={40} />
+                                <div className="h-40 flex items-center justify-center relative mb-4">
+                                    <div className="absolute inset-0 bg-purple-50 rounded-full blur-2xl opacity-60 scale-75 group-hover:scale-100 transition-all"></div>
+                                    <img src={carImg} alt="Car" className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Car</h3>
@@ -239,36 +246,37 @@ const About = () => {
                             </div>
                         </div>
 
-                        {/* Premium Car Service */}
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all group">
+                        {/* Truck Service (Replaces Premium Car) */}
+                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all group overflow-hidden">
                             <div className="text-center space-y-6">
-                                <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                                    <Crown className="text-purple-600" size={40} />
+                                <div className="h-40 flex items-center justify-center relative mb-4">
+                                    <div className="absolute inset-0 bg-blue-50 rounded-full blur-2xl opacity-60 scale-75 group-hover:scale-100 transition-all"></div>
+                                    <img src={truckImg} alt="Truck" className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Premium Car</h3>
-                                    <p className="text-gray-600 mb-4">Luxury sedans for premium experience</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Truck</h3>
+                                    <p className="text-gray-600 mb-4">Reliable goods transport & logistics</p>
                                 </div>
                                 <div className="space-y-3 text-left">
                                     <div className="flex items-center gap-3">
                                         <CheckCircle className="text-purple-600" size={16} />
-                                        <span className="text-sm text-gray-600">Luxury sedan vehicles</span>
+                                        <span className="text-sm text-gray-600">Heavy load capacity</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <CheckCircle className="text-purple-600" size={16} />
-                                        <span className="text-sm text-gray-600">Premium interiors</span>
+                                        <span className="text-sm text-gray-600">Safe goods transport</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <CheckCircle className="text-purple-600" size={16} />
-                                        <span className="text-sm text-gray-600">Top-rated drivers</span>
+                                        <span className="text-sm text-gray-600">Verified partners</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <CheckCircle className="text-purple-600" size={16} />
-                                        <span className="text-sm text-gray-600">Complimentary water</span>
+                                        <span className="text-sm text-gray-600">Inter-city options</span>
                                     </div>
                                 </div>
                                 <div className="pt-4">
-                                    <div className="text-2xl font-bold text-purple-600">₹18/km</div>
+                                    <div className="text-2xl font-bold text-purple-600">₹25/km</div>
                                     <div className="text-sm text-gray-500">Starting fare</div>
                                 </div>
                             </div>
@@ -318,7 +326,7 @@ const About = () => {
                             The principles that guide everything we do
                         </p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
                             {
@@ -369,7 +377,7 @@ const About = () => {
                 <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
                     <h2 className="text-4xl font-heading font-bold mb-6">Join Our Journey</h2>
                     <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-                        Be part of India's transportation revolution. Whether you're a rider or driver, 
+                        Be part of India's transportation revolution. Whether you're a rider or driver,
                         we're building the future together.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
@@ -395,14 +403,12 @@ const About = () => {
                         {/* Customer App */}
                         <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all group cursor-pointer">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                    <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                                        <span className="text-white font-bold text-sm">T</span>
-                                    </div>
+                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                                    <img src={customerAppImg} alt="Transporter Customer App" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-purple-600 group-hover:translate-x-2 transition-transform">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
                                     </svg>
                                 </div>
                             </div>
@@ -421,17 +427,12 @@ const About = () => {
                         {/* Driver App */}
                         <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all group cursor-pointer">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                    <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center relative">
-                                        <span className="text-white font-bold text-sm">T</span>
-                                        <div className="absolute -bottom-1 -right-1 bg-gray-900 text-white text-xs px-1 rounded">
-                                            DRIVER
-                                        </div>
-                                    </div>
+                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                                    <img src={driverAppImg} alt="Transporter Driver App" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-purple-600 group-hover:translate-x-2 transition-transform">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
                                     </svg>
                                 </div>
                             </div>

@@ -19,9 +19,17 @@ export const initRecaptcha = () => {
     }
 
     try {
+        const container = document.getElementById("recaptcha-container");
+        if (!container) {
+            console.error("Recaptcha container not found");
+            return null;
+        }
+
+        console.log("Initializing RecaptchaVerifier with auth:", auth ? "exists" : "missing");
+
         window.recaptchaVerifier = new RecaptchaVerifier(
             auth,
-            "recaptcha-container",
+            container,
             {
                 size: "invisible",
                 callback: () => {

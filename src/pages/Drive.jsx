@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, DollarSign, Clock, Shield, MapPin, Smartphone, Info, Mail, Lock, User } from 'lucide-react';
+import { CheckCircle, DollarSign, Clock, Shield, MapPin, Smartphone, Info, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '../services/firebase';
+import driverImg from '../assets/driver1.png';
+import autoImg from '../assets/auto1.jpg';
+import carImg from '../assets/car1.jpg';
+import truckImg from '../assets/truck1.jpg';
+import customerAppImg from '../assets/playstorecustomer.png';
+import driverAppImg from '../assets/playstoredriver.png';
 
 const Drive = () => {
     // Auth State
@@ -75,107 +81,120 @@ const Drive = () => {
         <div className="min-h-screen bg-white">
             <Navbar />
 
-            {/* Hero Section */}
-            <div className="relative min-h-screen w-full flex items-center pt-20 pb-20 overflow-hidden bg-white">
-                {/* Background Elements */}
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-purple-50 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/4"></div>
-                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-slate-50 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/4"></div>
+            {/* Hero Section - Mobile Optimized */}
+            <div className="relative min-h-[auto] md:min-h-[85vh] w-full bg-slate-50 overflow-hidden flex flex-col md:flex-row">
 
-                <div className="w-full px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center relative z-10 max-w-7xl mx-auto">
-
-                    {/* Text Content */}
-                    <div className="space-y-8">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-100 text-purple-600 text-sm font-medium shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
-                            Join India's Fastest Growing Fleet
+                {/* Left Content */}
+                <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-8 lg:p-16 relative z-20 pt-28 md:pt-16">
+                    <div className="max-w-xl space-y-6 md:space-y-8 text-center md:text-left">
+                        <div className="inline-block">
+                            <span className="bg-orange-100 text-orange-700 font-bold px-4 py-1.5 rounded-full text-xs md:text-sm tracking-wide border border-orange-200">
+                                🚀 Hiring in 25+ Cities
+                            </span>
                         </div>
 
-                        <h1 className="text-5xl md:text-7xl font-heading font-bold leading-tight text-slate-900">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Drive with</span> <br />
-                            Transporter
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-heading font-black text-slate-900 leading-tight">
+                            Turn <br />
+                            <span className="text-purple-600 relative">
+                                Kilometers
+                                <svg className="absolute w-full h-2 md:h-3 -bottom-1 left-0 text-purple-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" /></svg>
+                            </span> <br />
+                            Into Cash.
                         </h1>
 
-                        <p className="text-lg text-slate-600 max-w-lg leading-relaxed">
-                            Be your own boss. Earn more with zero commission on your first 100 rides.
-                            Flexible hours, instant payouts, and 24/7 support.
+                        <p className="text-lg md:text-xl text-slate-500 font-medium leading-relaxed px-2 md:px-0">
+                            Join the revolution. Zero joining fees. Instant payouts.
+                            The freedom to earn is just a ride away.
                         </p>
 
-                        <div className="flex flex-wrap gap-4">
-                            <div className="flex items-center gap-3 px-6 py-4 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                                <div className="p-2 bg-purple-50 rounded-lg text-purple-600 font-bold">
-                                    <DollarSign size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="font-heading font-bold leading-none text-slate-900">Zero Commission</h4>
-                                    <span className="text-xs text-slate-500">First 100 rides</span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3 px-6 py-4 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                                <div className="p-2 bg-purple-50 rounded-lg text-purple-600 font-bold">
-                                    <Clock size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="font-heading font-bold leading-none text-slate-900">Flexible Hours</h4>
-                                    <span className="text-xs text-slate-500">Work when you want</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Driver Benefits Widget / Right Side */}
-                    <div className="relative">
-                        {/* Decorative Floaties */}
-                        <div className="absolute -top-12 -right-12 w-24 h-24 bg-purple-100 rounded-2xl rotate-12 opacity-60"></div>
-                        <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-indigo-50 rounded-full opacity-60"></div>
-
-                        <div className="relative bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
-                            <div className="text-center mb-6">
-                                <h3 className="text-xl font-bold text-slate-900 mb-2">Driver Benefits</h3>
-                                <p className="text-slate-500 text-sm">Start earning with Transporter</p>
-                            </div>
-
-                            <div className="space-y-4 mb-6">
-                                <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl">
-                                    <div className="p-2 bg-purple-100 rounded-lg">
-                                        <DollarSign className="text-purple-600" size={24} />
-                                    </div>
-                                    <div>
-                                        <div className="text-2xl font-black text-purple-600">₹35,000+</div>
-                                        <div className="text-xs text-slate-600">Average Monthly Earnings</div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl">
-                                    <div className="p-2 bg-purple-100 rounded-lg">
-                                        <Clock className="text-purple-600" size={24} />
-                                    </div>
-                                    <div>
-                                        <div className="text-2xl font-black text-purple-600">24/7</div>
-                                        <div className="text-xs text-slate-600">Flexible Working Hours</div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl">
-                                    <div className="p-2 bg-purple-100 rounded-lg">
-                                        <Shield className="text-purple-600" size={24} />
-                                    </div>
-                                    <div>
-                                        <div className="text-2xl font-black text-purple-600">100%</div>
-                                        <div className="text-xs text-slate-600">Safety & Insurance</div>
-                                    </div>
-                                </div>
-                            </div>
-
+                        <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
                             <button
                                 onClick={handleSignUpToDrive}
-                                className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all"
+                                className="w-full md:w-auto px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-purple-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-3"
                             >
-                                Sign Up to Drive
+                                Become a Captain
+                                <div className="bg-white/20 rounded-full p-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                                </div>
                             </button>
                         </div>
                     </div>
+                </div>
 
+                {/* Right Image Side */}
+                <div className="w-full md:w-1/2 relative h-[45vh] md:h-auto bg-purple-600 mt-8 md:mt-0">
+                    <img
+                        src={driverImg}
+                        alt="Transporter Captain"
+                        className="absolute inset-0 w-full h-full object-cover object-top opacity-90"
+                    />
+                    {/* Creative Connector */}
+                    <div className="absolute -top-1 left-0 w-full h-16 bg-slate-50 z-10 block md:hidden" style={{ clipPath: 'ellipse(50% 60% at 50% 0%)' }}></div>
+                    <div className="absolute top-0 left-0 w-16 h-full bg-slate-50 z-10 hidden md:block" style={{ clipPath: 'ellipse(60% 50% at 0% 50%)' }}></div>
+                </div>
+            </div>
+
+            {/* Make Money / Vehicle Selection Section */}
+            <div className="py-16 md:py-24 bg-white relative">
+                <div className="container px-4 md:px-6">
+                    <div className="text-center max-w-4xl mx-auto mb-12 md:mb-16 space-y-4">
+                        <h2 className="text-3xl md:text-5xl font-heading font-black text-slate-900 leading-tight">
+                            Attach your <span className="text-purple-600">Auto, Car, or Truck</span>
+                        </h2>
+                        <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl mx-auto">
+                            Apply now to become a Transporter driver-partner. Start earning in 24 hours!
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+                        {/* Auto Card */}
+                        <div className="group relative rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-300">
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-50 to-white -z-10 group-hover:scale-105 transition-transform duration-500"></div>
+                            <div className="p-6 md:p-8">
+                                <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">Attach Auto</h3>
+                                <p className="text-slate-500 text-sm mb-6">Earn up to ₹35,000/month</p>
+                                <div className="h-40 md:h-48 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-yellow-100 rounded-full blur-2xl opacity-60 scale-75 group-hover:scale-100 transition-all"></div>
+                                    <img src={autoImg} alt="Auto" className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
+                                </div>
+                                <button className="w-full mt-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 group-hover:bg-purple-600 transition-colors">
+                                    Register Auto <ArrowRight size={18} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Car Card */}
+                        <div className="group relative rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-300">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-white -z-10 group-hover:scale-105 transition-transform duration-500"></div>
+                            <div className="p-8">
+                                <h3 className="text-2xl font-bold text-slate-900 mb-2">Attach Car</h3>
+                                <p className="text-slate-500 text-sm mb-6">Earn up to ₹55,000/month</p>
+                                <div className="h-48 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-purple-100 rounded-full blur-2xl opacity-60 scale-75 group-hover:scale-100 transition-all"></div>
+                                    <img src={carImg} alt="Car" className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
+                                </div>
+                                <button className="w-full mt-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 group-hover:bg-purple-600 transition-colors">
+                                    Register Car <ArrowRight size={18} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Truck Card */}
+                        <div className="group relative rounded-[2rem] overflow-hidden bg-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-300">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white -z-10 group-hover:scale-105 transition-transform duration-500"></div>
+                            <div className="p-8">
+                                <h3 className="text-2xl font-bold text-slate-900 mb-2">Attach Truck</h3>
+                                <p className="text-slate-500 text-sm mb-6">Earn up to ₹70,000/month</p>
+                                <div className="h-48 flex items-center justify-center relative">
+                                    <div className="absolute inset-0 bg-blue-100 rounded-full blur-2xl opacity-60 scale-75 group-hover:scale-100 transition-all"></div>
+                                    <img src={truckImg} alt="Truck" className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500 drop-shadow-xl" />
+                                </div>
+                                <button className="w-full mt-6 py-3 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 group-hover:bg-purple-600 transition-colors">
+                                    Turn Miles to Money <ArrowRight size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -258,10 +277,8 @@ const Drive = () => {
                         {/* Customer App */}
                         <div className="bg-gray-50 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all group cursor-pointer">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                    <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                                        <span className="text-white font-bold text-sm">T</span>
-                                    </div>
+                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                                    <img src={customerAppImg} alt="Transporter Customer App" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-purple-600 group-hover:translate-x-2 transition-transform">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -284,13 +301,8 @@ const Drive = () => {
                         {/* Driver App */}
                         <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all group cursor-pointer border-2 border-purple-200">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                    <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center relative">
-                                        <span className="text-white font-bold text-sm">T</span>
-                                        <div className="absolute -bottom-1 -right-1 bg-gray-900 text-white text-xs px-1 rounded">
-                                            DRIVER
-                                        </div>
-                                    </div>
+                                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                                    <img src={driverAppImg} alt="Transporter Driver App" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="text-purple-600 group-hover:translate-x-2 transition-transform">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -404,7 +416,7 @@ const Drive = () => {
                     </div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 };
 

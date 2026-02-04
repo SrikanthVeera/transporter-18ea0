@@ -18,7 +18,7 @@ const Hero = () => {
             </div>
 
             {/* --- MOBILE HEADER (Title) --- */}
-            <div className="md:hidden pt-16 pb-4 w-full text-center z-20 px-4">
+            <div className="md:hidden pt-28 pb-4 w-full text-center z-20 px-4">
                 <h1 className="text-4xl font-black font-heading text-slate-900 tracking-widest uppercase">
                     TRANSPORTER
                 </h1>

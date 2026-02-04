@@ -666,7 +666,7 @@ const RideSelection = () => {
             `}</style>
 
             {/* Mobile Layout: Full Page Fixed Container (No Map) */}
-            <div className="lg:hidden fixed top-16 left-0 right-0 bottom-0 z-0 bg-white flex flex-col isolate overflow-hidden">
+            <div className="lg:hidden fixed top-24 left-0 right-0 bottom-0 z-0 bg-white flex flex-col isolate overflow-hidden">
 
                 {/* Main Content Wrapper */}
                 <div className="flex-1 flex flex-col overflow-hidden relative mt-4">

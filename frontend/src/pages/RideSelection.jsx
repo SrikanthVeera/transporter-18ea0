@@ -5,11 +5,11 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Car, Truck, Clock, MapPin, Star, ArrowRight, Shield, Info, ChevronLeft, Navigation, User, Package } from 'lucide-react';
-import { auth, initRecaptcha, signInWithPhoneNumber } from "../services/firebase";
+import { auth, signInWithCustomToken } from "../services/firebase";
 
 
 import { calculateDistanceAndPrice } from '../utils/helpers';
-import { verifyOtp as apiVerifyOtp } from '../services/api';
+import { verifyOtp as apiVerifyOtp, sendOtp as apiSendOtp } from '../services/api';
 import { GoogleMap, DirectionsRenderer, MarkerF } from '@react-google-maps/api';
 
 import autoImg from '../assets/auto1.jpg';
@@ -84,33 +84,7 @@ const RideSelection = () => {
     const [confirmationResult, setConfirmationResult] = useState(null);
 
 
-    useEffect(() => {
-        // Init Recaptcha on mount (container is now always present)
-        try {
-            if (window.recaptchaVerifier) {
-                try {
-                    window.recaptchaVerifier.clear();
-                } catch (e) {
-                    console.warn("Recaptcha clear error:", e);
-                }
-                window.recaptchaVerifier = null;
-            }
-            initRecaptcha();
-        } catch (error) {
-            console.error("Failed to initialize recaptcha:", error);
-        }
-
-        return () => {
-            if (window.recaptchaVerifier) {
-                try {
-                    window.recaptchaVerifier.clear();
-                } catch (e) {
-                    // ignore
-                }
-                window.recaptchaVerifier = null;
-            }
-        };
-    }, []);
+    // Recaptcha Init removed (Backend Flow)
 
     // Initialize Location Service with fallback/default values
     const {
@@ -183,6 +157,9 @@ const RideSelection = () => {
     useEffect(() => {
         const fetchDetails = async () => {
             if (!pickup || !drop || !window.google) return;
+
+            // Avoid Geocoding "Current Location" text if coords aren't ready
+            if (pickup === 'Current Location' && !pickupCoords) return;
 
             setLoading(true);
             try {
@@ -276,48 +253,16 @@ const RideSelection = () => {
         try {
             const formattedMobile = `+91${mobile}`;
 
-            // Handle reCAPTCHA (Skip strict check if on localhost to allow Test Numbers)
-            const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+            // Backend-driven OTP (Fast2SMS)
+            await apiSendOtp(formattedMobile);
 
-            if (!window.recaptchaVerifier) {
-                try {
-                    await initRecaptcha();
-                } catch (e) {
-                    // On localhost, we can proceed without recaptcha if using test numbers
-                    // if (!isLocalhost) throw e; 
-                    // console.warn("Localhost: Recaptcha init failed, proceeding with Test Number mode.");
-                    throw e;
-                }
-            }
-
-            const appVerifier = window.recaptchaVerifier;
-            // For production, verifier is mandatory. For localhost, it can be null (Test Mode).
-            if (!appVerifier) {
-                throw new Error("reCAPTCHA verifier not available. Please refresh and try again.");
-            }
-
-            const confirmation = await signInWithPhoneNumber(auth, formattedMobile, appVerifier);
-
-            setConfirmationResult(confirmation);
-            window.confirmationResult = confirmation;
             setIsOtpSent(true);
-            console.log("OTP sent via Firebase SMS");
+            setConfirmationResult(true); // Dummy true to indicate "sent" state if needed
+            console.log("OTP sent via Backend/Fast2SMS");
 
         } catch (error) {
             console.error("Send OTP failed:", error);
-            if (error.code === "auth/too-many-requests") {
-                setLoginError("Too many attempts. Please try again later.");
-            } else if (error.code === "auth/invalid-phone-number") {
-                setLoginError("Invalid phone number format.");
-            } else if (error.code === "auth/invalid-app-credential") {
-                setLoginError("Config Error: Add 'localhost' to Authorized Domains in Firebase Console.");
-            } else if (error.code === "auth/network-request-failed") {
-                setLoginError("Network Error: Check your connection or Firebase API Key restrictions.");
-            } else if (error.message && error.message.includes("reCAPTCHA")) {
-                setLoginError("reCAPTCHA error. Please refresh and try again.");
-            } else {
-                setLoginError(error.message || "Failed to send OTP. Please try again.");
-            }
+            setLoginError(error.response?.data?.error || error.message || "Failed to send OTP.");
         } finally {
             setLoading(false);
         }
@@ -327,24 +272,25 @@ const RideSelection = () => {
     const handleVerifyOtp = async () => {
         setLoading(true);
         try {
-            if (!confirmationResult) throw new Error("Please request OTP again");
+            if (!isOtpSent) throw new Error("Please request OTP first");
 
-            // 1. Verify with Firebase (real)
-            const result = await confirmationResult.confirm(otp);
-            const user = result.user;
+            const formattedMobile = `+91${mobile}`;
 
-            const idToken = await user.getIdToken();
+            // 1. Verify with backend and get JWT & Firebase Token
+            const response = await apiVerifyOtp(formattedMobile, otp);
+            const { token, firebaseToken, user, success } = response.data;
 
-            // 2. Verify with backend and get JWT
-            const response = await apiVerifyOtp(mobile, idToken);
-
-            if (!response.data?.success) {
+            if (!success || !firebaseToken) {
                 throw new Error(response.data?.error || "OTP verification failed");
             }
 
+            // 2. Sign in to Firebase Client SDK with Custom Token
+            await signInWithCustomToken(auth, firebaseToken);
+            console.log("Firebase Custom Auth Successful");
+
             setShowLoginModal(false);
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
 
             // Redirect logic
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -358,7 +304,7 @@ const RideSelection = () => {
 
         } catch (error) {
             console.error(error);
-            setLoginError('Invalid OTP or Network Error.');
+            setLoginError(error.response?.data?.error || error.message || 'Invalid OTP');
         } finally {
             setLoading(false);
         }
@@ -1128,8 +1074,7 @@ const RideSelection = () => {
                 <Footer />
             </div>
 
-            {/* Always-present Recaptcha Container */}
-            <div id="recaptcha-container"></div>
+            {/* Recaptcha Container Removed */}
 
             {/* Login / OTP Modal */}
             <AnimatePresence>

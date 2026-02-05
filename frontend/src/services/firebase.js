@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -84,4 +84,4 @@ export const initRecaptcha = async () => {
     }
 };
 
-export { signInWithPhoneNumber, signInWithEmailAndPassword, createUserWithEmailAndPassword };
+export { signInWithPhoneNumber, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken };

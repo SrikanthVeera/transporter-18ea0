@@ -20,6 +20,7 @@ api.interceptors.request.use(config => {
 
 
 
+export const sendOtp = (mobile) => api.post('/auth/send-otp', { mobile });
 export const verifyOtp = (mobile, otp) => api.post('/auth/verify-otp', { mobile, otp });
 export const getRideEstimate = (pickup, drop, vehicleType) =>
     api.get(`/ride/estimate`, { params: { ...pickup, ...drop, vehicleType } });

@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { verifyOtp as apiVerifyOtp } from '../services/api';
-import { auth, signInWithPhoneNumber, initRecaptcha } from '../services/firebase';
+import { verifyOtp as apiVerifyOtp, sendOtp as apiSendOtp } from '../services/api';
+import { auth, signInWithCustomToken } from '../services/firebase';
 
 const Login = () => {
     const [mobile, setMobile] = useState('');
     const [otp, setOtp] = useState('');
     const [step, setStep] = useState(1); // 1 = Mobile, 2 = OTP
     const [loading, setLoading] = useState(false);
-    const [confirmationResult, setConfirmationResult] = useState(null);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        // Init invisible recaptcha on mount
-        initRecaptcha('sign-in-button');
-    }, []);
 
     const handleSendOtp = async (e) => {
         e.preventDefault();
@@ -23,63 +17,54 @@ const Login = () => {
         const formattedMobile = mobile.startsWith('+') ? mobile : `+91${mobile}`; // Default to India
 
         try {
-            const appVerifier = window.recaptchaVerifier;
-            const confirmation = await signInWithPhoneNumber(auth, formattedMobile, appVerifier);
-            setConfirmationResult(confirmation);
+            // Backend-driven OTP (Fast2SMS)
+            await apiSendOtp(formattedMobile);
             setStep(2);
-            alert('OTP Sent via Firebase!');
+            alert('OTP Sent via SMS! (Mocked if no API Key)');
         } catch (error) {
-            console.error("Firebase Auth Error:", error);
-            alert('Failed to send OTP: ' + error.message);
-            // Reset recaptcha
-            if (window.recaptchaVerifier) {
-                window.recaptchaVerifier.render().then(widgetId => {
-                    window.grecaptcha.reset(widgetId);
-                });
-            }
+            console.error("OTP Send Error:", error);
+            alert('Failed to send OTP: ' + (error.response?.data?.error || error.message));
         } finally {
             setLoading(false);
         }
     };
 
-   const handleVerifyOtp = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-  if (!confirmationResult) {
-    alert("Please request OTP again");
-    setStep(1);
-    setLoading(false); // ✅ important
-    return;
-  }
+        try {
+            // Format mobile again (safe & consistent)
+            const formattedMobile = mobile.startsWith('+')
+                ? mobile
+                : `+91${mobile}`;
 
-  try {
-    // Format mobile again (safe & consistent)
-    const formattedMobile = mobile.startsWith('+')
-      ? mobile
-      : `+91${mobile}`;
+            // 1. Verify OTP with Backend & Get Tokens
+            const res = await apiVerifyOtp(formattedMobile, otp);
+            const { token, firebaseToken, user, success } = res.data;
 
-    // 1. Verify OTP with Firebase
-    const result = await confirmationResult.confirm(otp);
-    const user = result.user;
-    const idToken = await user.getIdToken();
+            if (success && firebaseToken) {
+                // 2. Sign in to Firebase Client SDK with Custom Token
+                // This ensures Maps, Firestore (client-side) work as this user.
+                await signInWithCustomToken(auth, firebaseToken);
+                console.log("Firebase Custom Auth Successful");
 
-    console.log("Firebase Verified. ID Token:", idToken);
+                // 3. Store Backend JWT & User
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
 
-    // 2. Send Firebase token to backend for JWT
-    const res = await apiVerifyOtp(formattedMobile, idToken);
+                navigate('/app');
+            } else {
+                throw new Error('Verification failed or missing tokens');
+            }
 
-    localStorage.setItem('token', res.data.token);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
-
-    navigate('/app');
-  } catch (err) {
-    console.error(err);
-    alert('Invalid OTP or Server Error');
-  } finally {
-    setLoading(false);
-  }
-};
+        } catch (err) {
+            console.error(err);
+            alert('Invalid OTP or Server Error: ' + (err.response?.data?.error || err.message));
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -99,8 +84,6 @@ const Login = () => {
                                 placeholder="9876543210"
                             />
                         </div>
-                        {/* Invisible Recaptcha Button Anchor */}
-                        <div id="sign-in-button"></div>
 
                         <button
                             type="submit"
